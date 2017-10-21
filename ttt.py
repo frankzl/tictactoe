@@ -2,7 +2,9 @@ from tkinter import *
 from tkinter import font
 top = Tk()
 
-winCondition = 3
+# MODIFY THESE TWO VALUES
+winCondition = 4
+fieldSize = 5
 
 turn = True;
 f1 = font.Font(family='Helvetica', size=70, weight='bold')
@@ -22,15 +24,16 @@ def setMark(x,y):
 def isGameOver(x,y):
 
     winDirection = [1,1,1,1]
+    reverseShift = [0, 0, 0, 0]
 
     btn = bArray[x][y]
     symbol = btn['text']
 
     for i in range(1, winCondition):
-        winDirection[0] += (bArray[(x+i) % winCondition][y].cget('text') == symbol)
-        winDirection[1] += (bArray[x][(y+i)%winCondition].cget('text') == symbol)
-        winDirection[2] += (bArray[(x+i)%winCondition][(y+i)%winCondition].cget('text') == symbol)
-        winDirection[3] += (bArray[(x-i)%winCondition][(y-i)%winCondition].cget('text') == symbol)
+        winDirection[0] += checkField((x+i) % winCondition,y)
+        winDirection[1] += checkField(x,(y+i)%winCondition)
+        winDirection[2] += checkField((x+i)%winCondition,(y+i)%winCondition)
+        winDirection[3] += checkField((x-i)%winCondition,(y+i)%winCondition)
     win = max(winDirection) >= winCondition;
     print(winDirection)
     w['text'] = ('Player ' + symbol + ' WINS!') if win else 'TIC TAC TOE'
@@ -38,10 +41,16 @@ def isGameOver(x,y):
 
 
 
+def getShiftValue(steps):
+    return winCondition - steps;
+
+def checkField(x,y, symbol):
+    return bArray[x][y].cget('text') == symbol
+
 def generateButtonArray():
-    for i in range(3):
+    for i in range(fieldSize):
         bArray.append([])
-        for j in range(3):
+        for j in range(fieldSize):
             btn = Button(top, font=f1, height=1, width=2, text=" ")
             btn.configure(command=lambda x=i, y=j: setMark(x,y))
             bArray[i].append(btn)
@@ -50,7 +59,7 @@ def generateButtonArray():
 generateButtonArray()
 
 w = Label(top, font=f2, text="TIC TAC TOE")
-w.grid(row=4, columnspan=3)
+w.grid(row=fieldSize+1, columnspan=fieldSize)
 
 
 top.mainloop()
